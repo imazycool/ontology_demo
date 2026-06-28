@@ -1,7 +1,7 @@
 class MySQLConnection:
 
     def __init__(self):
-        pass
+        self.connection = None
 
     def connect(self):
         pass
