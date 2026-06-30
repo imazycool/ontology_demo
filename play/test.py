@@ -17,6 +17,7 @@ from db.mysql_connection import MySQLConnection
 def main():
     db = MySQLConnection()
     print(db.connection)
+    print(db.host)
 
 
 if __name__ == "__main__":
