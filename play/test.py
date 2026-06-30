@@ -16,8 +16,10 @@ from db.mysql_connection import MySQLConnection
 
 def main():
     db = MySQLConnection()
+    db.connect()
     print(db.connection)
     print(db.host)
+    db.execute_query("SELECT * FROM entity_metadata")
 
 
 if __name__ == "__main__":
