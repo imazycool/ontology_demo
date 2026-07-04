@@ -1,5 +1,16 @@
+from repository import metadata_queries 
+
 class MetadataService:
 
+    def __init__(self, db):
+        self.db = db
+        
+        
+    
+    def get_entity_names(self):
+        rows=self.db.execute_query(metadata_queries.GET_ENTITY_NAMES) 
+        return [ row[0] for row in rows]
+    
     def get_entity(self, entity_name):
         pass
 

@@ -12,14 +12,16 @@ if str(SRC_DIR) not in sys.path:
     sys.path.insert(0, str(SRC_DIR))
 
 from db.mysql_connection import MySQLConnection
-
+from services.metadata_service import MetadataService 
 
 def main():
     db = MySQLConnection()
     db.connect()
-    print(db.connection)
-    print(db.host)
-    db.execute_query("SELECT * FROM entity_metadata")
+    metadata = MetadataService(db)
+    entities = metadata.get_entity_names()
+    print(entities)
+    db.disconnect()
+
 
 
 if __name__ == "__main__":
