@@ -1,12 +1,13 @@
-from app.session import Session 
+from app.session import Session
+
 
 class Startup:
 
-    def __init__(self, metadata_service):
-        self.metadata_service = metadata_service
+    def __init__(self, db):
+        self.db = db
+
 
     def initialize(self, application):
-        application.entities = \
-            self.metadata_service.get_entity_names()
+        self.db.connect()
         application.session = Session()
-    
+        

@@ -3,21 +3,19 @@
 
 class Application:
 
-    def __init__(self, startup):
+    def __init__(self, startup, navigator, renderer):
         self.startup = startup
-        self.entities = None
+        self.navigator = navigator
+        self.renderer = renderer
         self.session = None
 
 
 
     def start(self):
         self.startup.initialize(self)
-        print("===================================")
-        print(" Ontology Analytics Assistant")
-        print("===================================")
-        print("\nAvailable Business Entities\n")
-        for index, entity in enumerate(self.entities, start=1):
-            print(f"{index}. {entity}")
+        menu = self.navigator.get_main_menu()
+        choice = self.renderer.display(menu)
+        print(choice)
         
         
         

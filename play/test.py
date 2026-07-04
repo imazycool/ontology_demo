@@ -15,17 +15,22 @@ from db.mysql_connection import MySQLConnection
 from services.metadata_service import MetadataService 
 from app.application import Application
 from app.startup import Startup 
+from workflow.navigator import  Navigator
+from ui.cli_renderer import CLIRenderer 
 
 
 def main():
     db = MySQLConnection()
-    db.connect()
     metadata_service = MetadataService(db)
-    startup = Startup(metadata_service)
-    application = Application(startup)
+    startup = Startup(db)
+    navigator = Navigator(metadata_service)
+    renderer = CLIRenderer()
+    application = Application(
+        startup,
+        navigator,
+        renderer
+    )
     application.start()
-    db.disconnect()
-
 
 
 if __name__ == "__main__":
