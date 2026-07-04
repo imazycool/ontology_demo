@@ -13,13 +13,17 @@ if str(SRC_DIR) not in sys.path:
 
 from db.mysql_connection import MySQLConnection
 from services.metadata_service import MetadataService 
+from app.application import Application
+from app.startup import Startup 
+
 
 def main():
     db = MySQLConnection()
     db.connect()
-    metadata = MetadataService(db)
-    entities = metadata.get_entity_names()
-    print(entities)
+    metadata_service = MetadataService(db)
+    startup = Startup(metadata_service)
+    application = Application(startup)
+    application.start()
     db.disconnect()
 
 
