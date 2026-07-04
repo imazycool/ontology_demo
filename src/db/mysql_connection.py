@@ -2,7 +2,7 @@ import mysql.connector
 from mysql.connector import Error
 from dotenv import load_dotenv
 import os
-from common.exceptions import  DatabaseAlreadyConnectedError
+from common.exceptions import  DatabaseAlreadyConnectedError, DatabaseNotConnectedError
 
 
 class MySQLConnection:
@@ -50,11 +50,50 @@ class MySQLConnection:
         """
         Close the active database connection.
         """
-        if self.connection:
+        if self.connection.is_connected():
             self.connection.close() 
         self.connection = None
 
 
 
-    def execute_query(self, query):
-        pass
+    def execute_query(self, query, params=None):
+        if not (self.connection.is_connected()):
+            raise DatabaseNotConnectedError(
+                "Database not connected."
+            )
+        try:
+            if self.connection.is_connected():
+                cursor=self.connection.cursor()
+                if params:
+                    cursor.execute(query, params)
+                else:
+                    cursor.execute(query)
+                rows=cursor.fetchall()
+                return rows 
+        except Exception:
+            raise 
+        finally:
+            if self.connection.is_connected() and 'cursor' in locals():
+                cursor.close()
+                
+    
+    def execute_single(self, query, params=None):
+        if not (self.connection.is_connected()):
+            raise DatabaseNotConnectedError(
+                "Database not connected."
+            )
+        try:
+            if self.connection.is_connected():
+                cursor=self.connection.cursor()
+                if params:
+                    cursor.execute(query, params)
+                else:
+                    cursor.execute(query)
+                first_row=cursor.fetchone()
+                return first_row 
+        except Exception:
+            raise 
+        finally:
+            if self.connection.is_connected() and 'cursor' in locals():
+                cursor.close()
+                
