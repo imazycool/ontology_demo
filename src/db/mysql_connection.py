@@ -39,7 +39,6 @@ class MySQLConnection:
                 port=self.port
             )
             if self.connection.is_connected():
-                # print("Successfully connected to MySQL database")
                 return self.connection
         except Exception:
             raise

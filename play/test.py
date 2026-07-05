@@ -17,13 +17,15 @@ from app.application import Application
 from app.startup import Startup 
 from workflow.navigator import  Navigator
 from ui.cli_renderer import CLIRenderer 
+from workflow.analyze_workflow import AnalyzeWorkflow 
 
 
 def main():
     db = MySQLConnection()
-    metadata_service = MetadataService(db)
     startup = Startup(db)
-    navigator = Navigator(metadata_service)
+    metadata_service = MetadataService(db)
+    analyze_workflow = AnalyzeWorkflow(metadata_service)
+    navigator = Navigator(analyze_workflow) 
     renderer = CLIRenderer()
     application = Application(
         startup,
