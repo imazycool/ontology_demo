@@ -1,14 +1,17 @@
 
 from ui.renderer import Renderer
 from services.sql_builder import SQLBuilder
+from app.session import Session 
 
 class Application:
 
-    def __init__(self, startup, navigator, renderer: Renderer):
+    def __init__(self, startup, navigator, renderer, sql_builder, db):
         self.startup = startup
         self.navigator = navigator
         self.renderer = renderer
-        self.session = None
+        self.sql_builder = sql_builder
+        self.db = db
+        self.session = Session()
 
 
 
@@ -22,6 +25,19 @@ class Application:
                 self.renderer.show_message(result.message)
             current_menu = result.menu
                 
+    def _execute_analysis(self):
+        sql = self.sql_builder.build(self.session)
+        self.session.generated_sql = sql
+        rows = self.db.execute_sql(sql)
+        self.session.query_result = rows
+        headers = [
+            self.session.selected_dimensions[0],
+            self.session.selected_metric
+        ]
+        self.renderer.show_message("Generated SQL")
+        self.renderer.show_message(sql)
+        self.renderer.show_table(headers, rows)
+        
                 
     def start(self):
         self.startup.initialize(self)
@@ -50,22 +66,12 @@ class Application:
                     )
                 )
             elif current_menu.menu_id == "DIMENSION_MENU":
-                self.session.selected_dimensions = [selected_option]
-                self.renderer.show_message(
-                    f"""
-                    Analysis Summary
-                    Entity     : {self.session.selected_entity}
-                    Metric     : {self.session.selected_metric}
-                    Dimension  : {self.session.selected_dimensions[0]}
-                    """
-                    )
-                builder = SQLBuilder(self.metadata_service)
-                sql = builder.build(self.session)
-                self.session.generated_sql = sql
-                rows = self.query_service.execute(sql)
-                self.session.query_result = rows
-                self.renderer.show_table(rows)
-        
+                self.session.selected_dimensions = [
+                    selected_option
+                ]
+                self._execute_analysis()
+                break
+                    
         
         
         

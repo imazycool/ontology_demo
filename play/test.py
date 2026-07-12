@@ -24,48 +24,45 @@ from services.query_service import QueryService
 
 
 def main():
-    # db = MySQLConnection()
-    # startup = Startup(db)
-    # metadata_service = MetadataService(db)
-    # analyze_workflow = AnalyzeWorkflow(metadata_service)
-    # navigator = Navigator(analyze_workflow) 
-    # renderer = CLIRenderer()
-    # application = Application(
-    #     startup,
-    #     navigator,
-    #     renderer
-    # )
-    # application.start()
+    db = MySQLConnection()
+    startup = Startup(db)
+    metadata_service = MetadataService(db)
+    analyze_workflow = AnalyzeWorkflow(metadata_service)
+    navigator = Navigator(analyze_workflow)
+    renderer = CLIRenderer()
+    sql_builder = SQLBuilder(metadata_service)
+    application = Application(startup, navigator, renderer, sql_builder, db)
+    application.start()
     
 
-    db = MySQLConnection()
-    db.connect()
+    # db = MySQLConnection()
+    # db.connect()
 
-    metadata_service = MetadataService(db)
+    # metadata_service = MetadataService(db)
 
-    builder = SQLBuilder(metadata_service)
+    # builder = SQLBuilder(metadata_service)
 
-    renderer = CLIRenderer()
+    # renderer = CLIRenderer()
 
-    session = Session()
+    # session = Session()
 
-    session.selected_entity = "Customer"
-    session.selected_metric = "Customer Count"
-    session.selected_dimensions = ["Country"]
+    # session.selected_entity = "Customer"
+    # session.selected_metric = "Customer Count"
+    # session.selected_dimensions = ["Country"]
 
-    sql = builder.build(session)
+    # sql = builder.build(session)
 
-    print("Generated SQL")
-    print(sql)
+    # print("Generated SQL")
+    # print(sql)
 
-    rows = db.execute_sql(sql)
+    # rows = db.execute_sql(sql)
 
-    headers = [
-        session.selected_dimensions[0],
-        session.selected_metric
-    ]
+    # headers = [
+    #     session.selected_dimensions[0],
+    #     session.selected_metric
+    # ]
 
-    renderer.show_table(headers, rows)
+    # renderer.show_table(headers, rows)
     
 
 

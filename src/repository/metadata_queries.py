@@ -76,6 +76,15 @@ GET_ATTRIBUTE = """
     """
 
 
+GET_ENTITY_DIMENSIONS = """
+    SELECT
+        attribute_name
+    FROM attribute_metadata
+    WHERE entity_name = %s
+    AND is_dimension = 1
+    ORDER BY attribute_name;
+    """
+
 
 # ==================================================
 # METRIC_DEFINITION 
