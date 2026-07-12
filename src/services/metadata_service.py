@@ -11,6 +11,17 @@ class MetadataService:
         rows=self.db.execute_query(metadata_queries.GET_ENTITY_NAMES) 
         return [ row[0] for row in rows]
     
+    
+    
+    def get_metrics(self, entity_name: str):
+        rows = self.db.execute_query(
+            metadata_queries.GET_ENTITY_METRICS,
+            (entity_name,)
+        )
+        return [row[0] for row in rows]
+    
+    
+    
     def get_entity(self, entity_name):
         pass
 

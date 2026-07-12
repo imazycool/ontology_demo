@@ -18,9 +18,16 @@ GET_ENTITY_NAMES = """
 
 
 # ==================================================
-# _METADATA
+# METRIC_METADATA
 # ==================================================
-
+GET_ENTITY_METRICS = """
+    SELECT
+        display_name
+    FROM metric_metadata
+    WHERE entity_name = %s
+    AND is_active = TRUE
+    ORDER BY display_order;
+    """
 
 
 

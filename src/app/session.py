@@ -7,3 +7,5 @@ class Session:
         self.selected_attribute = None
         self.selected_metric = None
         self.selected_relationship = None
+        self.selected_dimensions = []
+        self.selected_filters = {}
