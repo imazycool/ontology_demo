@@ -26,3 +26,11 @@ class CLIRenderer(Renderer):
                 return int(input("\nEnter your choice <number> : "))
             except ValueError:
                 self.terminal.write("Please enter a valid number.")
+                
+    
+    def show_table(self, headers: list[str], rows: list):
+        self.terminal.show_header("Query Result")
+        self.terminal.show_table(headers, rows)
+        
+    
+    

@@ -12,6 +12,7 @@ class Navigator:
 
     def get_main_menu(self):
         return Menu(
+            menu_id="MAIN_MENU",
             title="Ontology Analytics Assistant",
             message="How can I help you today?",
             options=[
@@ -28,12 +29,14 @@ class Navigator:
             return self.analyze_workflow.start()
         elif choice == 2:
             return Menu(
+                menu_id="METADATA_MENU",
                 title="Business Metadata Explorer",
                 message="This module is under development.",
                 options=[]
             )
         elif choice == 3:
             return Menu(
+                menu_id="ADMIN_MENU",
                 title="Metadata Administration",
                 message="This module is under development.",
                 options=[]

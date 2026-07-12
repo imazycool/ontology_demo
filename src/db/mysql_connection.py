@@ -96,3 +96,11 @@ class MySQLConnection:
             if self.connection.is_connected() and 'cursor' in locals():
                 cursor.close()
                 
+    
+    
+    def execute_sql(self, sql: str):
+        if not self.connection.is_connected():
+            self.connect()
+        cursor = self.connection.cursor()
+        cursor.execute(sql)
+        return cursor.fetchall()

@@ -18,22 +18,57 @@ from app.startup import Startup
 from workflow.navigator import  Navigator
 from ui.cli_renderer import CLIRenderer 
 from workflow.analyze_workflow import AnalyzeWorkflow 
+from app.session import Session 
+from services.sql_builder import SQLBuilder 
+from services.query_service import QueryService 
 
 
 def main():
+    # db = MySQLConnection()
+    # startup = Startup(db)
+    # metadata_service = MetadataService(db)
+    # analyze_workflow = AnalyzeWorkflow(metadata_service)
+    # navigator = Navigator(analyze_workflow) 
+    # renderer = CLIRenderer()
+    # application = Application(
+    #     startup,
+    #     navigator,
+    #     renderer
+    # )
+    # application.start()
+    
+
     db = MySQLConnection()
-    startup = Startup(db)
+    db.connect()
+
     metadata_service = MetadataService(db)
-    analyze_workflow = AnalyzeWorkflow(metadata_service)
-    navigator = Navigator(analyze_workflow) 
+
+    builder = SQLBuilder(metadata_service)
+
     renderer = CLIRenderer()
-    application = Application(
-        startup,
-        navigator,
-        renderer
-    )
-    application.start()
+
+    session = Session()
+
+    session.selected_entity = "Customer"
+    session.selected_metric = "Customer Count"
+    session.selected_dimensions = ["Country"]
+
+    sql = builder.build(session)
+
+    print("Generated SQL")
+    print(sql)
+
+    rows = db.execute_sql(sql)
+
+    headers = [
+        session.selected_dimensions[0],
+        session.selected_metric
+    ]
+
+    renderer.show_table(headers, rows)
+    
 
 
 if __name__ == "__main__":
     main()
+    

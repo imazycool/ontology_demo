@@ -21,12 +21,58 @@ class MetadataService:
         return [row[0] for row in rows]
     
     
+    # def get_dimensions(self, entity_name):
+    #     rows = self.db.execute_query(
+    #         metadata_queries.GET_ENTITY_DIMENSIONS,
+    #         (entity_name,)
+    #     )
+    #     return [row[0] for row in rows]
     
-    def get_entity(self, entity_name):
-        pass
+    
+    
+    def get_dimensions(self, entity_name: str) -> list[str]:
+        rows = self.db.execute_query(
+            metadata_queries.GET_ENTITY_DIMENSIONS,
+            (entity_name,)
+        )
+        return [row[0] for row in rows]
 
-    def get_attribute(self, attribute_name):
-        pass
+    
+    
+    def get_entity(self, entity_name: str):
+        rows = self.db.execute_query(
+            metadata_queries.GET_ENTITY,
+            (entity_name,)
+        )
+        if not rows:
+            return None
+        return rows[0]
+    
+    
+    
+    def get_metric_definition(self, metric_name: str):
+        rows = self.db.execute_query(
+            metadata_queries.GET_METRIC_DEFINITION,
+            (metric_name,)
+        )
+        if not rows:
+            return None
+        return rows[0]
+    
+    
+    
+
+    def get_attribute(self, entity_name: str, attribute_name: str):
+        rows = self.db.execute_query(
+            metadata_queries.GET_ATTRIBUTE,
+            (entity_name, attribute_name)
+        )
+        if not rows:
+            return None
+        return rows[0]
+
+
+
 
     def get_metric(self, metric_name):
         pass
