@@ -1,0 +1,6 @@
+"metric_name";"formula";"source_table"
+"Revenue";"SUM(revenue)";"fact_sales"
+"Cost";"SUM(cost)";"fact_sales"
+"Profit";"SUM(profit)";"fact_sales"
+"Customer Count";"COUNT(customer_name)";"dim_customer"
+"New Customers";"COUNT(customer_name)";"dim_customer"

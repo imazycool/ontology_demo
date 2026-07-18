@@ -1,0 +1,5 @@
+"source_table";"source_column";"target_table";"target_column";"relationship_type"
+"fact_sales";"customer_name";"dim_customer";"customer_name";"many-to-one"
+"fact_sales";"sales_rep";"dim_salesperson";"sales_rep";"many-to-one"
+"fact_sales";"order_date";"dim_date";"order_date";"many-to-one"
+"fact_sales";"device_type";"dim_product";"device_type";"many-to-one"

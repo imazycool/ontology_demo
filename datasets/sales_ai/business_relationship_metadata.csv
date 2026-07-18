@@ -1,0 +1,5 @@
+"source_entity";"relationship_name";"target_entity";"cardinality";"description";"business_rule"
+"Customer";"places";"Sales Order";"One-to-Many";"A customer can place multiple sales orders.";"Every sales order must belong to one customer."
+"Sales Order";"contains";"Product";"Many-to-One";"Each sales order contains one product.";"Every sales order must reference one product."
+"Sales Order";"handled by";"Sales Representative";"Many-to-One";"Each sales order is handled by one sales representative.";"Every sales order must have one responsible sales representative."
+"Sales Order";"occurs on";"Date";"Many-to-One";"Each sales order occurs on one business date.";"Every sales order must have one order date."

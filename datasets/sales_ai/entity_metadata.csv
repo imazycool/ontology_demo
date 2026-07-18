@@ -1,0 +1,6 @@
+"entity_name";"description";"business_domain";"entity_category";"physical_table";"entity_type";"business_owner";"status";"is_active"
+"Customer";"Person or organization purchasing products or services.";"Sales";"Master Data";"dim_customer";"Dimension";"Sales";"Active";1
+"Date";"Business calendar used across the enterprise for reporting and operational processes.";"Enterprise";"Reference Data";"dim_date";"Dimension";"Enterprise Data Office";"Active";1
+"Product";"Product or service offered to customers.";"Sales";"Master Data";"dim_product";"Dimension";"Product Management";"Active";1
+"Sales Order";"Completed sales transaction between a customer and the organization.";"Sales";"Transaction";"fact_sales";"Fact";"Sales Operations";"Active";1
+"Sales Representative";"Employee responsible for managing customer sales.";"Sales";"Master Data";"dim_salesperson";"Dimension";"Sales";"Active";1
