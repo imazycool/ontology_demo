@@ -1,0 +1,13 @@
+[
+  {"name":"entity_name","type":"STRING"},
+  {"name":"attribute_name","type":"STRING"},
+  {"name":"description","type":"STRING"},
+  {"name":"data_type","type":"STRING"},
+  {"name":"physical_attribute","type":"STRING"},
+  {"name":"is_primary_key","type":"BOOL"},
+  {"name":"is_nullable","type":"BOOL"},
+  {"name":"is_filterable","type":"BOOL"},
+  {"name":"is_measure","type":"BOOL"},
+  {"name":"is_dimension","type":"BOOL"},
+  {"name":"business_definition","type":"STRING"}
+]
