@@ -1,0 +1,9 @@
+[
+  {"name":"order_id","type":"INT64"},
+  {"name":"customer_id","type":"INT64"},
+  {"name":"product_id","type":"INT64"},
+  {"name":"salesperson_id","type":"INT64"},
+  {"name":"date_id","type":"INT64"},
+  {"name":"order_value_eur","type":"FLOAT64"},
+  {"name":"cost","type":"FLOAT64"}
+]
