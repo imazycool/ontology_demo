@@ -1,0 +1,9 @@
+[
+  {"name":"parent_entity","type":"STRING"},
+  {"name":"child_entity","type":"STRING"},
+  {"name":"parent_key","type":"STRING"},
+  {"name":"child_key","type":"STRING"},
+  {"name":"relationship_type","type":"STRING"},
+  {"name":"join_type","type":"STRING"},
+  {"name":"description","type":"STRING"}
+]
