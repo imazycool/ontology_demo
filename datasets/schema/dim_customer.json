@@ -1,0 +1,5 @@
+[
+  {"name":"customer_id","type":"INT64"},
+  {"name":"customer_name","type":"STRING"},
+  {"name":"country","type":"STRING"}
+]
