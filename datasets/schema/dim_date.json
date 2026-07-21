@@ -1,0 +1,9 @@
+[
+  {"name":"date_id","type":"INT64"},
+  {"name":"date","type":"DATE"},
+  {"name":"year","type":"INT64"},
+  {"name":"quarter","type":"STRING"},
+  {"name":"month","type":"INT64"},
+  {"name":"month_name","type":"STRING"},
+  {"name":"day","type":"INT64"}
+]
