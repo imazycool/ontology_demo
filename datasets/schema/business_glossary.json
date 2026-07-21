@@ -1,0 +1,7 @@
+[
+  {"name":"business_term","type":"STRING"},
+  {"name":"business_definition","type":"STRING"},
+  {"name":"business_domain","type":"STRING"},
+  {"name":"synonyms","type":"STRING"},
+  {"name":"example","type":"STRING"}
+]
