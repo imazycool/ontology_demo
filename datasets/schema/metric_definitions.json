@@ -1,0 +1,5 @@
+[
+  {"name":"metric_name","type":"STRING"},
+  {"name":"formula","type":"STRING"},
+  {"name":"description","type":"STRING"}
+]
