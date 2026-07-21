@@ -1,0 +1,5 @@
+[
+  {"name":"salesperson_id","type":"INT64"},
+  {"name":"sales_manager","type":"STRING"},
+  {"name":"sales_rep","type":"STRING"}
+]
