@@ -1,0 +1,6 @@
+[
+  {"name":"entity_name","type":"STRING"},
+  {"name":"attribute_name","type":"STRING"},
+  {"name":"business_value","type":"STRING"},
+  {"name":"technical_value","type":"STRING"}
+]
