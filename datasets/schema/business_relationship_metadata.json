@@ -1,0 +1,6 @@
+[
+  {"name":"source_business_term","type":"STRING"},
+  {"name":"target_business_term","type":"STRING"},
+  {"name":"relationship","type":"STRING"},
+  {"name":"description","type":"STRING"}
+]
