@@ -1,44 +1,75 @@
 from google.cloud import bigquery
 
 from db.bq_setup import BQSetup
+from common.exceptions import (
+    DatabaseAlreadyConnectedError,
+    DatabaseNotConnectedError
+)
 
 
 class BQConnection:
 
     def __init__(self):
         self.client = None
-        self.project_id = None
+        self.setup = BQSetup()
 
     def connect(self):
-        """
-        Creates BigQuery client
-        """
 
-        setup = BQSetup()
-        setup.setup()
+        if self.client:
+            raise DatabaseAlreadyConnectedError(
+                "Database is already connected."
+            )
 
-        self.project_id = setup.project_id
+        try:
+            self.setup.setup()
 
-        self.client = bigquery.Client(
-            project=self.project_id
-        )
+            self.client = bigquery.Client(
+                project=self.setup.project_id
+            )
 
-        print("✓ Connected to BigQuery")
+            return self.client
 
-        return self.client
+        except Exception:
+            raise
 
-    def execute_query(self, sql):
+    def disconnect(self):
+
+        self.setup.reset()
+        self.client = None
+
+    def execute_query(self, query, params=None):
+
+        if self.client is None:
+            raise DatabaseNotConnectedError(
+                "Database not connected."
+            )
+
+        try:
+
+            job = self.client.query(
+                query,
+                job_config=None
+            )
+
+            return list(job.result())
+
+        except Exception:
+            raise
+
+    def execute_single(self, query, params=None):
+
+        rows = self.execute_query(query, params)
+
+        if rows:
+            return rows[0]
+
+        return None
+
+    def execute_sql(self, sql: str):
 
         if self.client is None:
             self.connect()
 
-        query_job = self.client.query(sql)
+        job = self.client.query(sql)
 
-        return query_job.result()
-
-    def close(self):
-
-        setup = BQSetup()
-        setup.reset()
-
-        print("✓ BigQuery session closed")
+        return list(job.result())
