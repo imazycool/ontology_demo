@@ -1,0 +1,51 @@
+from pathlib import Path
+import sys
+
+# Project Root
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+
+# Source Directory
+SRC_DIR = PROJECT_ROOT / "src"
+
+if str(SRC_DIR) not in sys.path:
+    sys.path.insert(0, str(SRC_DIR))
+
+from db.bq_connection import BQConnection
+from services.metadata_service import MetadataService
+from app.application import Application
+from app.startup import Startup
+from workflow.navigator import Navigator
+from workflow.analyze_workflow import AnalyzeWorkflow
+from ui.cli_renderer import CLIRenderer
+from services.sql_builder import SQLBuilder
+
+
+def main():
+
+    db = BQConnection()
+
+    startup = Startup(db)
+
+    metadata_service = MetadataService(db)
+
+    analyze_workflow = AnalyzeWorkflow(metadata_service)
+
+    navigator = Navigator(analyze_workflow)
+
+    renderer = CLIRenderer()
+
+    sql_builder = SQLBuilder(metadata_service)
+
+    application = Application(
+        startup,
+        navigator,
+        renderer,
+        sql_builder,
+        db
+    )
+
+    application.start()
+
+
+if __name__ == "__main__":
+    main()
