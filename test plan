@@ -1,0 +1,295 @@
+Revised Ownership and Boundaries
+System Testing Scope
+Groups B–F
+ Vector database validation
+ RAG functional and AI quality
+ MCP integration
+ End-to-end business workflows
+ Source-to-target reconciliation
+ Functional defect retesting and ST sign-off
+Upstream Dependency
+Group A — Knowledge Graph Build & Validation
+ KG team completes internal validation and provides approved outputs and evidence for ST.
+Independent Testing
+Group G — Non-Functional Testing
+ Performance and load testing
+ Stress and endurance testing
+ Scalability
+ Response time benchmarking
+
+
+Revised Ownership and Boundaries
+System Testing Scope
+Groups B–F
+￼ Vector database validation
+￼ RAG functional and AI quality
+￼ MCP integration
+￼ End-to-end business workflows
+￼ Source-to-target reconciliation
+￼ Functional defect retesting and ST sign-off
+Upstream Dependency
+Group A — Knowledge Graph Build & Validation
+￼ KG team completes internal validation and provides approved outputs and evidence for ST.
+Independent Testing
+Group G — Non-Functional Testing
+￼ Performance and load testing
+￼ Stress and endurance testing
+￼ Scalability
+￼ Response time benchmarking
+
+
+
+Revised Ownership and Boundaries
+System Testing Scope
+Groups B–F
+￼ Vector database validation
+￼ RAG functional and AI quality
+￼ MCP integration
+￼ End-to-end business workflows
+￼ Source-to-target reconciliation
+￼ Functional defect retesting and ST sign-off
+Upstream Dependency
+Group A — Knowledge Graph Build & Validation
+￼ KG team completes internal validation and provides approved outputs and evidence for ST.
+Independent Testing
+Group G — Non-Functional Testing
+￼ Performance and load testing
+￼ Stress and endurance testing
+￼ Scalability
+￼ Response time benchmarking
+
+
+
+AI System Integration Testing and Quality Validation Plan (Groups B–F)
+For Groups B–F, the responsibility is treated as AI System Integration Testing and Quality Validation, rather than conventional API testing alone.
+Objectives
+Establish that:
+￼ The Vector Database contains the right information and retrieves the right context.
+￼ RAG combines Knowledge Graph and Vector Database context correctly.
+￼ The LLM generates accurate, complete, and source-grounded answers.
+￼ MCP exposes the correct functionality to external AI applications.
+￼ The complete workflow works reliably across document batches, including reprocessing and updates.
+1. Overall System Testing Approach
+Execute the work in this sequence:
+System Testing Execution Sequence
+￼ B — Vector Database Validation: Establish that chunks, embeddings, and metadata are correct.
+￼ C — RAG Functional & AI Quality: Establish that retrieval and generated answers are accurate and grounded.
+￼ D — MCP Integration: Establish that MCP clients can discover and invoke tools correctly.
+￼ E — End-to-End Integration: Validate the entire document-to-answer workflow.
+￼ F — Reconciliation & ST Sign-off: Consolidate evidence, quality measurements, defects, and acceptance results.
+2. Detailed Testing Plan for Each Workstream
+Group B — Vector Database Validation
+Objective: Confirm that the vector database has the right chunks, metadata, and embeddings, and that relevant information can be retrieved for a given question.
+Test Execution Plan
+Test Activity
+How to Perform It
+Expected Result
+Record count validation
+Compare expected chunk count with vector record count
+Counts reconcile or differences are explained
+Metadata validation
+Query sample vector records
+Correct document ID, chunk ID, page, section, and metadata
+Chunk content validation
+Retrieve chunks and compare with original documents
+No unexplained missing or corrupted content
+Embedding validation
+Verify embedding exists and has expected dimensions
+Valid embedding for each eligible chunk
+Semantic retrieval
+Submit known questions and inspect top-K results
+Relevant chunks appear near the top
+Negative retrieval
+Ask unrelated or unsupported questions
+Irrelevant chunks are not presented as strong evidence
+Updated document testing
+Reprocess an updated document
+Current content is retrieved, stale content handled correctly
+Batch reconciliation
+Compare source inventory, processing results, and vector inventory
+Every document has an explainable processing state
+
+How to Measure Vector Quality
+Use a labelled retrieval dataset.
+Example:
+￼ Question: "What is the approval process for a project?"
+￼ Expected relevant chunks: 4
+￼ Retrieved top 5 chunks: 3 relevant, 2 irrelevant
+Metric
+Calculation
+Result
+Precision@5
+Relevant retrieved / Total retrieved
+3/5 = 60\%
+Recall@5
+Relevant retrieved / Total expected relevant
+3/4 = 75\%
+
+￼ Precision tells you whether the returned chunks are relevant.
+￼ Recall tells you whether the expected relevant chunks were found.
+￼ Also measure MRR (Mean Reciprocal Rank) to determine how highly the first relevant result appears, and nDCG@K when relevance has multiple grades.
+Tools Needed
+￼ Vector database query interface or SDK
+￼ Python for comparison and reconciliation
+￼ SQL/BigQuery if metadata or source inventory is stored there
+￼ Postman or an equivalent API client if retrieval is exposed through an API
+￼ Excel/CSV for the labelled expected-chunk dataset
+Group C — RAG Functional & AI Quality Validation
+Objective: Confirm that the RAG engine retrieves the correct KG and Vector context and generates answers that are correct, complete, and grounded. This is the most important AI quality testing activity in your scope.
+Build the Golden Question Dataset
+Start with 100 questions. Use the KG team's approved validation queries as the foundation, but extend them to cover RAG behaviour.
+Scenario Type
+Initial Questions
+Direct factual
+20
+Entity-based
+15
+Relationship-based
+15
+Multi-document
+15
+Contextual/follow-up
+10
+Missing information
+10
+Ambiguous questions
+10
+Irrelevant questions
+5
+Total
+100
+
+For every question, maintain:
+￼ Question ID
+￼ Question
+￼ Expected answer
+￼ Expected facts
+￼ Expected source documents
+￼ Expected page/section
+￼ Expected KG entities/relationships, where applicable
+Test Execution
+1. Submit the question directly to RAG.
+2. Capture the retrieved KG context.
+3. Capture the retrieved vector chunks.
+4. Capture the generated answer.
+5. Compare the answer against the expected facts.
+6. Verify source references.
+7. Score the response.
+8. Record defects and repeat after fixes.
+Example Scoring
+￼ Question: "Which teams are responsible for the project?"
+￼ Expected facts: Team A, Team B, Team C, Team D, Team E
+￼ Actual response: Team A (correct), Team B (correct), Team C (correct), Team X (incorrect), Team E (correct)
+Metric
+Calculation
+Score
+Completeness
+Expected facts present / Total expected
+5/5 = 100\%
+Correctness
+Generated facts correct / Total generated
+4/5 = 80\%
+Precision
+Generated facts correct / Total generated
+4/5 = 80\%
+Recall
+Expected facts correctly returned / Total expected
+4/5 = 80\%
+
+Recommended RAG Metrics
+Metric
+What It Measures
+Answer correctness
+Are the facts correct?
+Answer completeness
+Are all expected facts covered?
+Faithfulness / groundedness
+Are answer claims supported by retrieved context?
+Answer relevance
+Does the answer address the question?
+Context precision
+Are retrieved passages relevant?
+Context recall
+Did retrieval find the required evidence?
+Citation accuracy
+Do source references actually support the claims?
+Abstention accuracy
+Does the model avoid answering unsupported questions?
+
+Use a combination of deterministic comparisons, human review, and LLM-based evaluation.
+Example Evaluation (Question: "What is the approved project budget?")
+￼ Expected-value assertion: Expected: €500,000; actual: €450,000 — Fail
+￼ LLM evaluator: Answer is relevant, but factually incorrect
+￼ Human reviewer: Confirms the actual value should be €500,000
+Group D & E — End-to-End Business Workflows & MCP Integration
+I recommend using a small set of complete business scenarios to test component interoperability.
+Test Scenarios Matrix
+Scenario
+Test Workflow
+Expected Result
+E1
+Upload a new document \rightarrow process \rightarrow query through MCP
+New information appears in answer
+E2
+Upload multiple documents \rightarrow query across documents
+Correct cross-document answer
+E3
+Update an existing document \rightarrow reprocess \rightarrow query
+Updated answer reflects new information
+E4
+Upload duplicate document \rightarrow process \rightarrow query
+Duplicate handling follows requirements
+E5
+Query information present only in KG
+KG-derived context is used correctly
+E6
+Query information present only in Vector content
+Vector retrieval provides correct context
+E7
+Query requiring KG + Vector
+Combined evidence supports the answer
+E8
+Ask unsupported question
+System appropriately abstains or explains limitations
+E9
+Simulate upstream failure
+Failure is visible and does not produce misleading output
+
+Group F — Reconciliation & ST Sign-off
+Maintain a consolidated reconciliation report using the following structure:
+Reconciliation Level
+Expected
+Actual
+Measurement
+Source documents
+1,450
+Actual count
+Document completeness
+Processed documents
+Eligible source count
+Actual count
+Processing completeness
+KG outputs
+Approved KG baseline
+Actual
+Entity/relationship precision and recall
+Vector records
+Expected chunks
+Actual
+Chunk completeness
+Golden questions
+100
+Actual executions
+Execution coverage
+RAG answers
+Expected facts
+Actual facts
+Correctness/completeness
+MCP invocations
+Expected calls
+Actual successful calls
+Invocation success
+E2E scenarios
+Approved scenarios
+Actual completed
+Scenario execution coverage
