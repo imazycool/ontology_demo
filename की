@@ -1,0 +1,5 @@
+The identified service key was an old credential from the previous year. It had already expired and was removed from both the HSBC Git repository and the associated project in December last year.
+
+During a subsequent backup activity, the old credential was inadvertently included in the repository due to an accidental merge.
+
+This was an unintentional occurrence. The credential was already expired and had been decommissioned, with no intended usage or deployment.
