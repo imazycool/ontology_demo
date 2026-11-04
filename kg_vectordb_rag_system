@@ -1,0 +1,555 @@
+# Knowledge Graph, Vector Database & RAG -- System Testing Strategy
+
+**Version 1.0 -- Discussion Draft**\
+**Purpose:** Define a practical, measurable system-testing baseline for
+a solution that processes approximately 1,400 source documents in
+incremental batches and uses a Knowledge Graph (KG), a Vector Database,
+and Retrieval-Augmented Generation (RAG).
+
+------------------------------------------------------------------------
+
+## 1. Objective and Scope
+
+The objective is to assess whether:
+
+1.  The Knowledge Graph is being enriched as new documents are ingested.
+2.  The Vector Database retrieves relevant evidence for user questions.
+3.  The RAG solution produces accurate, complete, evidence-based
+    answers.
+4.  The solution behaves appropriately when information is incomplete.
+5.  Adding new document batches does not degrade previously working
+    functionality.
+
+The proposed approach deliberately starts with a **Minimum Viable
+Testing Framework (MVP)**. It uses the KG approved by the KG team as a
+**provisional reference baseline**, rather than attempting to
+independently certify every KG fact before system testing can begin.
+
+### 1.1 Conceptual solution flow
+
+``` mermaid
+flowchart TD
+    A["Source Documents<br/>Approx. 1,400"] --> B["Batch Ingestion"]
+    B --> C["Document Parsing and Chunking"]
+    C --> D["Knowledge Extraction"] 
+    C --> E["Embedding Generation"]
+    D --> F["Knowledge Graph"]
+    E --> G["Vector Database"]
+    F --> H["KG / RAG Retrieval Integration"]
+    G --> H
+    H --> I["LLM Answer Generation"]
+    I --> J["Generated Answer"]
+    J --> K["Application / MCP Integration"]
+    K --> L["End User"]
+```
+
+*Note: This is a conceptual view. The actual architecture must confirm
+whether KG and Vector Database retrieval operate in parallel,
+sequentially, or through another integration pattern. MCP is shown as an
+integration layer; its exact position should be aligned with the
+implemented design.*
+
+## 2. Knowledge Graph and Entity Enrichment
+
+A Knowledge Graph represents business information through:
+
+-   **Entities (nodes):** For example, companies, people, products, or
+    organisations.
+-   **Relationships (edges):** Connections between entities, such as
+    `ACQUIRED`, `HAS_CEO`, or `OPERATES_IN`.
+-   **Attributes:** Facts associated with an entity, such as country,
+    industry, or revenue.
+
+When additional documents are ingested, the KG may create new entities,
+add attributes or relationships to existing entities, update existing
+facts, or encounter conflicting information. A higher entity count alone
+does not demonstrate better KG quality.
+
+### 2.1 Enrichment categories
+
+Classify selected entities using an agreed completeness measure. The
+following thresholds are proposed for the initial baseline and should be
+confirmed with the KG team.
+
+  ------------------------------------------------------------------------
+  Category                 Illustrative completeness Meaning
+  --------------------- ---------------------------- ---------------------
+  Highly enriched                           80--100% Most expected
+                                                     attributes and
+                                                     relationships are
+                                                     present
+
+  Average enriched                           50--79% Some important
+                                                     information is
+                                                     present; some is
+                                                     missing
+
+  Poorly enriched                             0--49% Limited information
+                                                     is available
+  ------------------------------------------------------------------------
+
+For example, if ten attributes are expected for an entity, eight
+available attributes represent 80% completeness, six represent 60%, and
+three represent 30%.
+
+**Completeness is not accuracy.** An attribute can be present but
+incorrect. The initial system-testing scope can use the KG team's
+approved baseline and a small number of source-document spot-checks as a
+safeguard.
+
+### 2.2 Enrichment assessment flow
+
+``` mermaid
+flowchart TD
+    A["Approved Knowledge Graph"] --> B["Select Entities"]
+    B --> C["Identify Expected Attributes / Relationships"]
+    C --> D["Check Available Information"]
+    D --> E["Calculate Completeness"]
+    E --> F{"Classify Entity"}
+    F -->|"80–100%"| G["Highly Enriched"]
+    F -->|"50–79%"| H["Average Enriched"]
+    F -->|"0–49%"| I["Poorly Enriched"]
+    G --> J["Create Category-wise Test Questions"]
+    H --> J
+    I --> J
+```
+
+Suggested KG measures include entity count, attribute completeness,
+relationship completeness, selected-sample accuracy, and availability of
+source references. Detailed automation of every KG quality measure is
+not a prerequisite for the MVP.
+
+## 3. Reference Baseline and Golden Questions
+
+For the first iteration, use the **KG baseline approved by the KG team**
+as the provisional reference for system testing. This avoids duplicating
+the KG team's full validation activity and allows downstream testing to
+start sooner.
+
+This is a **KG-based baseline comparison**, not an independent
+ground-truth certification. For selected golden questions, retain the
+relevant source-document reference and perform a source-level
+spot-check. If a clear contradiction is found between the KG and its
+source, record the question as an exception and seek clarification from
+the KG team rather than silently treating either result as correct.
+
+### 3.1 Golden-question creation flow
+
+``` mermaid
+flowchart TD
+    A["KG Team-approved Baseline"] --> B["Select Sample Entities"]
+    B --> C["Classify Enrichment Level"]
+    C --> D["Identify Relevant Facts"]
+    D --> E["Create Golden Questions"]
+    E --> F["Define Expected Answers"]
+    F --> G["Record Source Document / Page"]
+    G --> H["Spot-check Selected Answers"]
+    H --> I["Approved Golden Question Set"]
+    I --> J["Version and Retain"]
+```
+
+Each golden-question record should contain, where available:
+
+  Field                     Description
+  ------------------------- -------------------------------------------
+  Question ID               Unique test identifier
+  Entity ID / Name          Entity being tested
+  Enrichment category       High, Average, or Poor
+  Question                  Test question
+  Expected answer / facts   Required answer content
+  Source reference          Document ID and page or section
+  Expected behaviour        Answer, partial answer, or abstain
+  Status and version        Approved, exception, and baseline version
+
+The question set should cover all three enrichment categories. For
+poorly enriched entities, include questions whose expected behaviour is
+to abstain when the required information is not available.
+
+## 4. Vector Database Testing
+
+The Vector Database typically stores document chunks, embeddings, and
+metadata. Its primary responsibility is to retrieve relevant content for
+a query; it does not normally generate the final natural-language
+answer.
+
+### 4.1 Retrieval test flow
+
+``` mermaid
+flowchart TD
+    A["Golden Question"] --> B["Create Query Embedding"]
+    B --> C["Search Vector Database"]
+    D["Source Documents"] --> E["Chunking and Embeddings"]
+    E --> C
+    C --> F["Top-K Retrieved Chunks"]
+    F --> G["Compare with Expected Evidence"]
+    G --> H["Calculate Retrieval Measures"]
+    H --> I["Vector Retrieval Report"]
+```
+
+### 4.2 Key retrieval measures
+
+  -----------------------------------------------------------------------
+  Measure                             What it evaluates
+  ----------------------------------- -----------------------------------
+  Precision@K                         Proportion of the top-K retrieved
+                                      chunks that are relevant
+
+  Recall@K                            Proportion of expected relevant
+                                      evidence retrieved in the top K
+
+  Retrieval relevance                 Whether retrieved content addresses
+                                      the question
+
+  Chunk coverage                      Whether expected evidence is
+                                      present and searchable
+
+  Metadata accuracy                   Whether document, page, entity, and
+                                      other metadata are correct
+  -----------------------------------------------------------------------
+
+For each question, compare the retrieved chunks with the expected
+evidence. Record whether the correct supporting content was retrieved,
+not merely whether a vaguely related chunk appeared.
+
+## 5. RAG Functional and Answer Quality Testing
+
+RAG uses retrieved context to generate an answer. Testing should assess
+the answer's factual correctness, coverage, grounding, citations, and
+behaviour when evidence is insufficient.
+
+### 5.1 RAG evaluation flow
+
+``` mermaid
+flowchart TD
+    A["Golden Question"] --> B["RAG Request"]
+    B --> C["Retrieve Context"]
+    C --> D["LLM Generates Answer"]
+    D --> E["Generated Answer"]
+    E --> F["Compare with Expected Facts"]
+    F --> G["Accuracy and Completeness"]
+    F --> H["Hallucination / Unsupported Claims"]
+    F --> I["Citation Validation"]
+    G --> J["RAG Quality Results"]
+    H --> J
+    I --> J
+```
+
+### 5.2 Distinguish the measures
+
+-   **Accuracy:** Are the factual claims in the answer correct?
+-   **Completeness:** How many of the expected facts are covered?
+-   **Hallucination rate:** What proportion of factual claims are
+    unsupported by the available evidence?
+-   **Citation accuracy:** Do the cited documents and locations actually
+    support the claims?
+-   **Abstention behaviour:** Does the system appropriately say that the
+    information is unavailable instead of guessing?
+
+For example, if three facts are expected and the answer correctly
+provides two while omitting the third, the answer may have 100% accuracy
+for the facts it did provide and 66.7% completeness. If it invents a
+third fact, that unsupported claim should be counted in the
+hallucination assessment.
+
+## 6. Minimum Viable AI Quality Scorecard
+
+Start with six primary measures. Report each measure at the appropriate
+layer; do not combine unrelated measures into one number without making
+the calculation transparent.
+
+  -----------------------------------------------------------------------
+  KPI                     Purpose                 Main layer
+  ----------------------- ----------------------- -----------------------
+  Answer accuracy         Correctness of answer   RAG; KG baseline checks
+                          facts                   
+
+  Answer completeness     Coverage of expected    RAG
+                          facts                   
+
+  Retrieval relevance     Relevance of retrieved  Vector Database
+                          evidence                
+
+  Hallucination rate      Unsupported factual     RAG
+                          claims                  
+
+  Source citation         Whether citations       RAG
+  accuracy                support the answer      
+
+  Response consistency    Whether repeated runs   RAG
+                          preserve the same       
+                          meaning                 
+  -----------------------------------------------------------------------
+
+### 6.1 Reporting approach
+
+Produce three concise reports:
+
+1.  **Enrichment Quality Report** -- entity counts and completeness by
+    enrichment category.
+2.  **Vector DB and RAG Quality Report** -- retrieval and answer-quality
+    results.
+3.  **Overall AI Quality Dashboard** -- consolidated KPIs, trends,
+    exceptions, and batch-to-batch comparison.
+
+The most important comparison is AI quality by enrichment category:
+highly enriched versus average versus poorly enriched entities. In
+particular, measure whether the system answers when evidence exists and
+abstains when it does not.
+
+A weighted overall score may be introduced later. If used, its
+components and weights must be agreed, documented, and consistently
+applied. Keep hallucination rate visible as a separate KPI; a favourable
+overall score must not conceal serious unsupported answers. Treat
+response length, vague wording, and stylistic variation as secondary
+observations in the MVP rather than primary weighted KPIs.
+
+## 7. Incremental Ingestion, Regression, and Repeatability
+
+The approximately 1,400 documents will be loaded in batches rather than
+all at once. A practical starting point is 100 documents per batch.
+
+  Stage               Cumulative documents Main activity
+  ----------------- ---------------------- -----------------------------------------------------
+  Batch 1                              100 Establish initial KG, Vector DB, and RAG baseline
+  Batch 2                              200 Validate new information and existing functionality
+  Batch 3                              300 Repeat checks and review entity updates
+  Further batches              400 onwards Continue the same controlled cycle
+  Final                      Approx. 1,400 Complete final cumulative evaluation
+
+### 7.1 Batch-wise testing flow
+
+``` mermaid
+flowchart TD
+    A["Ingest First 100 Documents"] --> B["Build / Update KG and Vector DB"]
+    B --> C["Run Initial Golden Questions"]
+    C --> D["Record Baseline V1"]
+    D --> E["Ingest Next 100 Documents"]
+    E --> F["Update KG and Vector DB"]
+    F --> G["Run Existing Golden Questions"]
+    F --> H["Run New Questions"]
+    G --> I["Compare with Previous Results"]
+    H --> I
+    I --> J{"Regression or Unexpected Change?"}
+    J -->|"Yes"| K["Log and Investigate"]
+    K --> L["Fix / Clarify and Re-test"]
+    J -->|"No"| M["Approve Batch Results"]
+    L --> M
+    M --> N["Save New Versioned Baseline"]
+    N --> E
+```
+
+Run three types of checks after each new batch:
+
+**A. Regression testing**\
+Re-run the fixed golden questions from previous batches. Identify
+previously passing questions that now fail, become incomplete, retrieve
+different evidence, or unexpectedly stop receiving an answer. A changed
+answer is not automatically a defect: a newer, valid fact may have
+superseded an older one. Check source evidence and effective dates
+before classifying it as a regression.
+
+**B. Enrichment testing**\
+Check whether new documents add expected attributes or relationships to
+existing entities and whether new entities are created correctly.
+Compare completeness and relevant KG outputs with the previous batch.
+
+**C. Repeatability testing**\
+Run selected questions multiple times against the same data and
+configuration. Compare semantic meaning and factual content, not exact
+wording. A wording change alone is not necessarily a quality failure.
+Record model, prompt, retrieval configuration, and other relevant
+versions so unexplained variation can be investigated.
+
+Maintain two question sets:
+
+-   **Fixed golden set:** Existing questions used for regression
+    testing.
+-   **Incremental golden set:** New questions derived from information
+    introduced by the latest batch.
+
+## 8. Key Risks and Controls
+
+  -----------------------------------------------------------------------
+  Risk                    Possible impact         Suggested control /
+                                                  test
+  ----------------------- ----------------------- -----------------------
+  Duplicate documents or  Repeated or             Duplicate checks and
+  chunks                  over-represented        ingestion counts
+                          evidence                
+
+  Conflicting facts       Incorrect or ambiguous  Check source dates,
+                          answers                 effective periods, and
+                                                  conflict handling
+
+  Entity-resolution       Duplicate or            Sample entity and
+  errors                  incorrectly merged      relationship checks
+                          entities                
+
+  Retrieval displacement  New chunks push         Re-run fixed retrieval
+                          relevant older chunks   tests after every batch
+                          out of top-K            
+
+  KG--Vector DB           One layer reflects      Compare update status
+  synchronisation gap     updates while another   and source/version
+                          remains stale           references
+
+  Stale information       Outdated facts are      Validate dates and
+                          returned as current     temporal context
+
+  Model or configuration  Results change for      Record model, prompt,
+  changes                 reasons unrelated to    embedding, and
+                          documents               retrieval versions
+  -----------------------------------------------------------------------
+
+Three risks deserve particular attention:
+
+1.  **Retrieval displacement:** New chunks can change ranking and push
+    previously relevant chunks out of the top-K results.
+2.  **Conflicting information:** Different documents may describe facts
+    at different points in time. For example, two people may have been
+    CEO in different years; this is not necessarily a contradiction.
+3.  **Cross-layer synchronisation:** The KG may be updated while the
+    Vector Database still contains stale or missing content, or vice
+    versa.
+
+## 9. Roles, Deliverables, and Readiness
+
+### 9.1 Indicative responsibilities
+
+  -----------------------------------------------------------------------
+  Team                                Responsibility / expected handover
+  ----------------------------------- -----------------------------------
+  KG team                             Build and validate KG; provide
+                                      approved baseline, enrichment
+                                      information, and known limitations
+
+  Vector DB / pipeline team           Confirm chunking, indexing,
+                                      metadata, embedding, and retrieval
+                                      readiness
+
+  RAG / AI team                       Provide RAG endpoint,
+                                      model/configuration details, and
+                                      execution support
+
+  MCP / integration team              Confirm integration endpoints,
+                                      authentication, tools, and schemas
+                                      as applicable
+
+  System Testing team                 Prepare golden questions, execute
+                                      tests, record evidence, calculate
+                                      KPIs, and report defects
+
+  Project stakeholders                Agree thresholds, review risks, and
+                                      approve acceptance criteria
+  -----------------------------------------------------------------------
+
+### 9.2 Main deliverables
+
+-   KG baseline and handover report.
+-   Entity enrichment classification.
+-   Version-controlled golden-question repository.
+-   Vector DB retrieval test report.
+-   RAG answer-quality test report.
+-   Batch-wise incremental and regression report.
+-   Overall AI quality dashboard.
+-   Final system-testing summary and sign-off.
+
+## 10. MVP Plan and Open Points
+
+### 10.1 Recommended MVP
+
+1.  Start with the first 100 documents.
+2.  Obtain the KG team's approved baseline and known limitations.
+3.  Classify a representative sample of entities as Highly, Average, or
+    Poorly Enriched.
+4.  Create a manageable golden-question set across all three categories,
+    including expected abstentions.
+5.  Retain source references and spot-check selected expected answers.
+6.  Run the same questions through the relevant KG, Vector DB, and RAG
+    paths.
+7.  Calculate the six primary KPIs and record the initial results as
+    Baseline V1.
+8.  After each additional 100-document batch, run regression,
+    enrichment, and repeatability checks; then version and retain the
+    results.
+
+Numerical pass/fail thresholds should be agreed with stakeholders after
+the first baseline results are available. Do not assume that
+illustrative enrichment bands are automatically acceptance thresholds
+for AI quality.
+
+### 10.2 Points to confirm with the technical teams
+
+  -----------------------------------------------------------------------
+  Question                            Why it matters
+  ----------------------------------- -----------------------------------
+  Are KG and Vector DB built in       Confirms test dependencies and
+  parallel or sequentially?           execution flow
+
+  Does RAG retrieve from both KG and  Defines the actual retrieval paths
+  Vector DB?                          to test
+
+  Can the KG team provide             Enables consistent entity
+  enrichment/completeness             classification
+  information?                        
+
+  Are source document and page        Supports golden-answer spot-checks
+  references retained for KG facts?   
+
+  Can new documents update existing   Defines incremental test scenarios
+  entities and facts?                 
+
+  Are old vector chunks replaced,     Affects retrieval regression and
+  retained, or re-indexed?            stale content
+
+  Are effective dates or historical   Helps evaluate time-dependent
+  facts maintained?                   answers
+
+  Are citations returned in RAG       Enables citation-accuracy testing
+  responses?                          
+  -----------------------------------------------------------------------
+
+------------------------------------------------------------------------
+
+## 11. Summary
+
+The proposed framework establishes a practical way to evaluate the
+complete solution as documents are added incrementally:
+
+``` mermaid
+flowchart TD
+    A["Source Documents<br/>~1,400"] --> B["Batch Ingestion"]
+    B --> C["Knowledge Graph"]
+    B --> D["Vector Database"]
+    C --> E["Entity Enrichment Classification"]
+    E --> F["High / Average / Poor"]
+    F --> G["Golden Questions"]
+    G --> H["KG-based Provisional Baseline"]
+    G --> I["Vector Retrieval Tests"]
+    G --> J["RAG Answer Tests"]
+    H --> K["Quality Evaluation"]
+    I --> K
+    J --> K
+    K --> L["Six Primary KPIs"]
+    L --> M["Quality Reports / Dashboard"]
+    M --> N["Regression, Enrichment and Repeatability"]
+    N --> O["Next Document Batch"]
+    O --> B
+```
+
+This framework is intended to answer five core questions:
+
+1.  Are entities being enriched as expected?
+2.  Does the Vector Database retrieve relevant supporting information?
+3.  Does RAG provide accurate, complete, evidence-based answers?
+4.  Does the system abstain appropriately when information is missing,
+    particularly for poorly enriched entities?
+5.  Does quality remain stable as new document batches are ingested?
+
+**Recommendation:** Retain this as **Version 1.0 -- Discussion Draft**.
+Review the architecture assumptions, ownership, golden-question
+approach, and KPI definitions with the relevant teams. Once agreed,
+convert it into the formal System Testing Strategy and detailed Test
+Plan. The priority is to establish a reliable, measurable baseline
+quickly and enhance the framework only when the evidence or project
+needs justify it.
