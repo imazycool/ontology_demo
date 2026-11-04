@@ -1,0 +1,21 @@
+System Testing – Prerequisite and Gatekeeper Matrix
+
+Workstream Technical access required
+Knowledge Graph Build & Validation GCP bucket access (as applicable), pipeline execution/status visibility, KG read/query access, graph schema access Source document inventory, expected entities and relationships, entity/relationship schema, processing results, KG validation results, precision/recall/completeness, source traceability, known defects and limitations
+Vector Database Validation Vector DB read/query access, metadata access, embedding/index visibility Expected chunks, document-to-chunk mapping, metadata schema, embedding model/details, expected retrieval results, duplicate/stale record handling
+RAG Functional & AI Quality Validation RAG endpoint, model/configuration visibility where permitted, query and response access, retrieval trace/log access Golden questions, expected facts, expected KG/vector context, source references, scoring rubric, unsupported/ambiguous question behaviour, quality thresholds
+MCP Integration Validation MCP endpoint, approved MCP client, authentication/authorization, connectivity to backend services Tool catalogue, resource definitions, input/output schemas, sample requests/responses, expected error handling
+End-to-End System Testing Access to all required integrated components: KG, Vector DB, RAG and MCP; test environment and logs End-to-end scenarios, test documents, expected workflow, expected answers, source references, update/reprocessing scenarios
+ST Reconciliation & Sign-off Logs, dashboards, reporting access, defect tracking tool, evidence repository Reconciliation baseline, acceptance criteria, defect severity policy, known limitations, test evidence and sign-off requirements
+
+
+Gatekeeper checkpoints
+Gate A – KG handover KG validation completed; approved baseline, evidence, known defects and limitations shared Justin, Varun & Timmy
+Gate B – Vector readiness Vector records populated; metadata and embedding details available; retrieval can be queried Vector DB / Pipeline team
+Gate C – RAG readiness RAG endpoint available; golden questions and expected facts agreed; scoring criteria approved RAG / AI team
+Gate D – MCP readiness MCP connection established; tools/resources discoverable; sample invocations successful MCP / Integration team
+Gate E – E2E readiness All required components integrated; test environment, test data and logs available Integration / Environment team
+Gate F – ST closure Execution and reconciliation complete; critical defects resolved or formally accepted; evidence reviewed ST Lead / Project stakeho
+
+
+
