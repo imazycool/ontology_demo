@@ -1,0 +1,13 @@
+Hi Natalia,
+
+Please find below the details regarding the identified service key exposure.
+
+The identified service key was an old credential from the previous year. It had already expired and was removed from both the HSBC Git repository and the associated project in December last year.
+
+During a subsequent backup activity, the old credential was inadvertently reintroduced into the repository due to an accidental merge. This was an unintentional occurrence. The credential was already expired and decommissioned, with no intended usage or deployment.
+
+I have also attached a screenshot of the repository file metadata as supporting evidence for reference.
+
+Additionally, I have shared these details with my line manager to ensure that GCB Level 3 is informed.
+
+Please let me know if any further information or clarification is required.
